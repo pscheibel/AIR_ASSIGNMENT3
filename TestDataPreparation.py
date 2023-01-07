@@ -9,6 +9,8 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup  # pip install beautifulsoup4
 from nltk.corpus import stopwords
+from textblob import TextBlob
+import json
 
 
 class TestDataPreparation:
@@ -105,7 +107,6 @@ class TestDataPreparation:
                 #    text = text.replace(word, en_stemmer.stem(word))
                 # print(text[0:100])
 
-                from textblob import TextBlob
                 blob = TextBlob(text)
 
                 nouns = []
@@ -204,6 +205,8 @@ class TestDataPreparation:
         #   if idx == 10: break
         #   print(k, v)
         # print("length lookup: ", len(self.lookupDict))
+        with open('lookupdict.txt', 'w') as dict_file:
+            dict_file.write(json.dumps(self.lookupDict))
         return valueDocs
 
     def initializeTrainDataStructures(self, valueDocs):

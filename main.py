@@ -1,4 +1,6 @@
 # imports
+import reader
+from ApplyClassification import ApplyClassification
 from ClassificationNN import ClassificationNN
 from TestDataPreparation import TestDataPreparation
 
@@ -11,18 +13,21 @@ SCIENTIFICLABELS = {0: "Biology",
                     4: "Phyiscs"}
 
 
-def main(loadPdfs, trainNN):
+def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):
     preparation = TestDataPreparation()
     training = ClassificationNN()
+    application = ApplyClassification(SCIENTIFICLABELS)
     if loadPdfs:
         preparation.executeLoading(CACHING_FILES_ENABLED, SCIENTIFICLABELS)
     if trainNN:
         trainData, testData, lookupDict = preparation.executePreparation(SCIENTIFICLABELS)
-        training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS)
+        training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS, modelPath)
+    data, size = reader.readInput(prepareInput, inputPath)
+    application.classifyData(data, size, modelPath)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main(False, True)
+    main(False, False, False, "./input/")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
