@@ -1,17 +1,24 @@
-#imports
+# imports
+from ClassificationNN import ClassificationNN
+from TestDataPreparation import TestDataPreparation
+
+CACHING_FILES_ENABLED = True
+
+SCIENTIFICLABELS = {0: "Biology",
+                    1: "Computer Science",
+                    2: "Electrical Engineering",
+                    3: "Mathematics",
+                    4: "Phyiscs"}
 
 
-def main(prepareData, trainNN):
-    all_documents = documentUtil.readInAllDocuments(paper_directory)
-    # all_documents = []
-    query_parts = documentUtil.extractContentOfSearchQuery(search_query)
-    # print(query_parts)
-    indexed_data = documentUtil.applySearchIndex(query_parts, all_documents, usedAlgorithm, usedQueryComparison)
-    # visualizeIndexedDocumentList(indexed_data)
-    if len(indexed_data[0]) != 0:
-        radar_chart(indexed_data)
-    output = prepare_output(indexed_data)
-    return output
+def main(loadPdfs, trainNN):
+    preparation = TestDataPreparation()
+    training = ClassificationNN()
+    if loadPdfs:
+        preparation.executeLoading(CACHING_FILES_ENABLED, SCIENTIFICLABELS)
+    if trainNN:
+        trainData, testData, lookupDict = preparation.executePreparation(SCIENTIFICLABELS)
+        training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS)
 
 
 # Press the green button in the gutter to run the script.
