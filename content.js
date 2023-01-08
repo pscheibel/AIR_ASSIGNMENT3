@@ -4,6 +4,4 @@ function msgprint() {
 
 function main() {  
 			alert("You are Successfully Called the JavaScript function2");  
-		
-			alert(input); 
          }  
