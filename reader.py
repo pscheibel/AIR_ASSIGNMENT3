@@ -51,7 +51,7 @@ def createNounFiles(filePath):
 
 
 def readNounFiles():
-    dataset = []
+    dataset = {}
     fileNames = os.listdir(inputDestination)
     for fileName in fileNames:
         fullPath = str(inputDestination + "/" + fileName)
@@ -65,7 +65,7 @@ def readNounFiles():
 
             word = myEnt.split(',')[0]
             associatedWords.append(word)
-        dataset.append(associatedWords)
+        dataset[fileName] = associatedWords
 
     return dataset
 
@@ -77,13 +77,13 @@ def convertToIndexFiles(dataset):
     valueDocs = np.empty(len(dataset), dtype=object)
 
     valIdx = 0
-    for doc in dataset:
-        valueDocs[valIdx] = np.empty(len(doc), dtype=float)
-        for idx in range(len(doc)):
-            if doc[idx] not in lookupDict:
-                valueDocs[valIdx][idx] = len(lookupDict)
+    for item in dataset.items():
+        valueDocs[valIdx] = (item[0], np.empty(len(item[1]), dtype=float))
+        for idx in range(len(item[1])):
+            if item[1][idx] not in lookupDict:
+                valueDocs[valIdx][1][idx] = len(lookupDict)
             else:
-                valueDocs[valIdx][idx] = lookupDict[doc[idx]]
+                valueDocs[valIdx][1][idx] = lookupDict[item[1][idx]]
         valIdx += 1
 
     # for idx, (k, v) in enumerate(self.lookupDict.items()):

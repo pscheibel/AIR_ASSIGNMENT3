@@ -20,8 +20,8 @@ class ApplyClassification:
         model = TextClassificationModel(vocabSize+1, emsize, num_class)
         model.load_state_dict(torch.load(modelPath))
         model.eval()
-        for fileContent in data:
+        for fileName, fileContent in data:
             #print("tensor: ", torch.tensor(fileContent, dtype=torch.int64))
             predicted_label = model(torch.tensor(fileContent, dtype=torch.int64), torch.tensor([0]))
-            print("file is ", self.scientificLabels[predicted_label.argmax(1).item()])
+            print("file ", fileName, " is ", self.scientificLabels[predicted_label.argmax(1).item()])
         return
