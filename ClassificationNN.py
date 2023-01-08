@@ -4,6 +4,7 @@ from Output import plotAccuracyPerEpoch, plotAccuracyPerBatch
 from TextClassificationModel import TextClassificationModel
 import torch
 import time
+import os
 
 # classification training based on
 # https://medium.com/analytics-vidhya/a-simple-neural-network-classifier-using-pytorch-from-scratch-7ebb477422d2(03.01.2023)
@@ -14,15 +15,14 @@ device = "cpu"
 
 class ClassificationNN:
 
-    def startTraining(self, trainData, testData, vocabSize, scientificLabels):
+    def startTraining(self, trainData, testData, vocabSize, scientificLabels, modelPath):
         #print(trainData)
         trainDataloader = DataLoader(trainData, batch_size=5, shuffle=True, collate_fn=self.collate_batch)
         testDataloader = DataLoader(testData, batch_size=5, shuffle=True, collate_fn=self.collate_batch)
         num_class = len(scientificLabels)
         # print(num_class)
-        vocab_size = vocabSize
         emsize = 64
-        model = TextClassificationModel(vocab_size, emsize, num_class).to(device)
+        model = TextClassificationModel(vocabSize + 1, emsize, num_class).to(device)
         # Binary Cross Entropy loss
         # standard loss for binary classification
         loss_fn = torch.nn.CrossEntropyLoss()
@@ -49,6 +49,7 @@ class ClassificationNN:
         print("Final Test Accuracy after " + str(epochs) + " epochs" + " is " + str(acc))
         print("Best Total Test Accuracy: " + str(rememberAcc) + " In epoch: " + str(rememberEpoch))
         plotAccuracyPerEpoch(testAccAll)
+        torch.save(model.state_dict(), modelPath)
 
     def collate_batch(self, batch):
         labels, docs, offsets = [], [], [0]

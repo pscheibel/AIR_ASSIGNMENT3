@@ -9,6 +9,8 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup  # pip install beautifulsoup4
 from nltk.corpus import stopwords
+from textblob import TextBlob
+import json
 
 
 class TestDataPreparation:
@@ -23,10 +25,10 @@ class TestDataPreparation:
         self.createNounFiles(cachingFiles, scientificLabels)
 
     def executePreparation(self, scientificLabels):
-        self.setClassificationsOfTrainingData(scientificLabels)
+        wordCollectionPerLabel = self.setClassificationsOfTrainingData(scientificLabels)
         valueDocs = self.createLookUpDict()
         self.initializeTrainDataStructures(valueDocs)
-        return self.trainData, self.testData, self.lookupDict
+        return self.trainData, self.testData, self.lookupDict, wordCollectionPerLabel
 
     def get_pdfs(self, my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem):
         if currentItem >= maxLoopDepth or len(links) >= desiredDataPerCategory:
@@ -116,7 +118,6 @@ class TestDataPreparation:
                 #    text = text.replace(word, en_stemmer.stem(word))
                 # print(text[0:100])
 
-                from textblob import TextBlob
                 blob = TextBlob(text)
 
                 nouns = []
@@ -149,6 +150,10 @@ class TestDataPreparation:
     def setClassificationsOfTrainingData(self, scientificLabels):
         pt = "./labelledData/"
         filePathNames = os.listdir(pt)
+
+        wordCollectionPerLabel = {}
+        for category in scientificLabels.values():
+            wordCollectionPerLabel[category] = {}
 
         # print(filePathNames)
 
@@ -187,12 +192,18 @@ class TestDataPreparation:
                     myText += str(categoryId)
                     # print(myText)
                     f.write(myText + "\n")
-                    myText = ""
+                    for word in associatedWords:
+                        if word in wordCollectionPerLabel[category]:
+                            wordCollectionPerLabel[category][word] = wordCollectionPerLabel[category][word] + 1
+                        else:
+                            wordCollectionPerLabel[category][word] = 1
                     break
                 categoryId = categoryId + 1
         f.close()
-
+        for category in scientificLabels.values():
+            wordCollectionPerLabel[category] = dict(sorted(wordCollectionPerLabel[category].items(), key=lambda item: item[1], reverse=True))
         # print("finished")
+        return wordCollectionPerLabel
 
     def createLookUpDict(self):
         dictIdx = 0
@@ -215,6 +226,8 @@ class TestDataPreparation:
         #   if idx == 10: break
         #   print(k, v)
         # print("length lookup: ", len(self.lookupDict))
+        with open('lookupdict.txt', 'w') as dict_file:
+            dict_file.write(json.dumps(self.lookupDict))
         return valueDocs
 
     def initializeTrainDataStructures(self, valueDocs):
