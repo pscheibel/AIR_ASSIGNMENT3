@@ -3,15 +3,28 @@
 <Html>     
 <Head>      
 <Title>     
-Call a JavaScript function  
+AIR_ASSIGNMENT3 
 </Title> 
 <script src="./AIR_ASSIGNMENT3/content.js"></script>   
 </Head>  
+
 <Body>   
-<p>Click on the following button for calling the function: </p>        
-      <form>  
-         <input type = "button" onclick = "msgprint()" value = "Message Print">   
-      </form>       
-      <p>  
-</Body>   
+<p>Click on the following button for calling the function: </p>   
+
+<h1>Add as many URL's of Arxiv papers as you want seperated by ';'</h1>
+
+<form onsubmit="return setAction(this)">
+  <p><label for="w3review">Review of W3Schools:</label></p>
+  <textarea id="w3review" name="w3review" rows="4" cols="50">At w3schools.com you will learn how to make a website. They offer free tutorials in all web development technologies.</textarea>
+  <br>
+  <input id="submit" type="submit" value="Submit">
+</form>
+
+ <p>      
+<form>  
+ <input type = "button" onclick = "msgprint()" value = "Message Print">   
+</form>       
+<p>  
+</Body> 
+  
 </Html>  
