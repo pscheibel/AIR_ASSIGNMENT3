@@ -1,2 +1,3 @@
-import win32api
-win32api.MessageBox(0, 'hello', 'title')
+def test_main():
+    echo("Succcessfully called Python Script")
+    return "Succcessfully called Python Script"
