@@ -1,3 +1,5 @@
+import json
+
 import matplotlib.pyplot as plt
 import os
 
@@ -23,7 +25,6 @@ def subplots(allAcc):
     fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 12))
     plt.xticks(rotation=60)
     fig.tight_layout(pad=8.0)
-    #plt.subplots_adjust(bottom=1)
 
     colors = ["green" if i != max_acc else "maroon" for i in acc]
     ax1.bar(epochs, acc, color=colors, width=0.4)
@@ -120,4 +121,43 @@ def plotAccuracyPerBatch(allAcc):
 
         plt.savefig(path + "/accuracy_per_epoch_barchart_" + str(epoch) + ".png")
         plt.savefig(path + "/accuracy_per_epoch_barchart_" + str(epoch) + ".pdf")
+        plt.show()
+
+def subplotCorrectPredAndTfIdf():
+    if not os.path.exists('correctPredictions.txt'):
+        return
+    with open('correctPredictions.txt') as data:
+        correctPredictions = json.load(data)
+    if not os.path.exists('correctTF-IDFs.txt'):
+        return
+    with open('correctTF-IDFs.txt') as data:
+        correctTfIdf = json.load(data)
+
+    fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 12))
+    fig.tight_layout(pad=8.0)
+
+    ax1.plot(correctPredictions.keys(), correctPredictions.values())
+    ax1.set(xlabel='Topic', ylabel='Prediction')
+    ax1.set_title("Prediction per Topic")
+
+    ax2.plot(correctTfIdf.keys(), correctTfIdf.values())
+    ax2.set(xlabel='Topic', ylabel='TF-IDF')
+    ax2.set_title("Correct TF-IDF per Topic")
+
+    savePlot(plt, 'subplot_corrPred_tfIdf')
+
+#TODO mach ich noch fertig, aber wird net in die webseite kommen
+def plotRanking():
+    if not os.path.exists('perCentRankingDictionaries.txt'):
+        return
+    with open('perCentRankingDictionaries.txt') as data:
+        rankingDict = json.load(data)
+
+        for text_file in rankingDict:
+            x = rankingDict.get(text_file).keys()
+            y = rankingDict.get(text_file).values()
+
+            plt.plot(y, x, label=text_file)
+
+        plt.legend()
         plt.show()
