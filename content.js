@@ -2,6 +2,7 @@ function msgprint() {
             alert("You are Successfully Called the JavaScript function");  
          }  
 
-function main(input) {  
+function main() {  
+			let input = getElementById('in').innerHTML
             alert("You are Successfully Called the JavaScript function");  
          }  
