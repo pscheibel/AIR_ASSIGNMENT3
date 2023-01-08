@@ -3,6 +3,6 @@ function msgprint() {
          }
 
 function main() {
-            let input=getElementById('in').innerHTML
+            let input=document.getElementById('in').innerHTML
 			alert(input);
          }
