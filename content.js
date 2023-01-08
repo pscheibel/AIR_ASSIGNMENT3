@@ -1,8 +1,8 @@
 function msgprint() {  
-            alert("You are Successfully Called the JavaScript function");  
-         }
+    alert("You are Successfully Called the JavaScript function");
+}
 
 function main() {
-            let input=document.getElementById('in').innerHTML;
-			alert(input);
-         }
+    let input=document.getElementById('in').innerHTML;
+	alert(input);
+}
