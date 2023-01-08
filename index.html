@@ -7,12 +7,15 @@
     </Title>
     <script src="./content.js"></script>
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-	
+
 </Head>
 
 <Body>
 <p>
-    <py-script src="./test_py_programm.py">test_main()</py-script>
+    <py-script src="./test_py_programm.py">
+        from test_py_programm import *;
+        echo(test_main())
+    </py-script>
 </p>
 
 <h1>Add as many URL's of Arxiv papers as you want seperated by ';'</h1>
