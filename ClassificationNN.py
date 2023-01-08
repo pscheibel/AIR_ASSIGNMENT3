@@ -1,5 +1,6 @@
 from torch.utils.data import DataLoader
 
+from Output import plotAccuracyPerEpoch, plotAccuracyPerBatch
 from TextClassificationModel import TextClassificationModel
 import torch
 import time
@@ -30,19 +31,24 @@ class ClassificationNN:
         epochs = 45
         rememberEpoch = 0
         rememberAcc = 0
+        testAccAll = {}
+        training_plot_data = {}
         for t in range(epochs):
             print(f"Epoch {t + 1}\n-------------------------------")
-            self.train(trainDataloader, model, loss_fn, optimizer)
+            training_plot_data[t] = self.train(trainDataloader, model, loss_fn, optimizer)
             print("Test accuracy: ")
             acc = self.test(testDataloader, model, loss_fn)
             print(str(acc))
             if acc > rememberAcc:
                 rememberEpoch = t + 1
                 rememberAcc = acc
+            testAccAll[t] = acc
+        plotAccuracyPerBatch(training_plot_data)
         print("Done!")
         print("--------Recap-----------")
         print("Final Test Accuracy after " + str(epochs) + " epochs" + " is " + str(acc))
         print("Best Total Test Accuracy: " + str(rememberAcc) + " In epoch: " + str(rememberEpoch))
+        plotAccuracyPerEpoch(testAccAll)
         torch.save(model.state_dict(), modelPath)
 
     def collate_batch(self, batch):
@@ -66,6 +72,7 @@ class ClassificationNN:
         total_acc, total_count = 0, 0
         log_interval = 10
         start_time = time.time()
+        acc_per_batches = {}
         for idx, (label, text, offsets) in enumerate(dataloader):
             #print("label: ", label)
             #print("text: ", text)
@@ -85,8 +92,11 @@ class ClassificationNN:
                 print('| {:5d}/{:5d} batches '
                       '| accuracy {:8.3f}'.format(idx, len(dataloader),
                                                   total_acc / total_count))
+                acc_per_batches[idx] = (total_acc/total_count)
                 total_acc, total_count = 0, 0
                 start_time = time.time()
+
+        return acc_per_batches
 
     def test(self, dataloader, model, loss_fn):
         model.eval()
