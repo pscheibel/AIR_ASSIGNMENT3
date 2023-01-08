@@ -6,7 +6,7 @@ import torch
 import time
 import os
 
-# classification training based on
+# classification training in this file based on
 # https://medium.com/analytics-vidhya/a-simple-neural-network-classifier-using-pytorch-from-scratch-7ebb477422d2(03.01.2023)
 # and https://torchtutorialstaging.z5.web.core.windows.net/beginner/text_sentiment_ngrams_tutorial.html (03.01.2023)
 
