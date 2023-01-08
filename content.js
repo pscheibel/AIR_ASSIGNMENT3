@@ -3,6 +3,7 @@ function msgprint() {
          }  
 
 function main() {  
+			alert("You are Successfully Called the JavaScript function2");  
 			let input = getElementById('in').innerHTML
-            alert("You are Successfully Called the JavaScript function");  
+			alert(input); 
          }  
