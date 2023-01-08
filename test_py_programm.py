@@ -1,2 +1,2 @@
-def main():
+def test_main():
     echo("Succcessfully called Python Script")
