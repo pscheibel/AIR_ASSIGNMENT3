@@ -7,13 +7,16 @@
     </Title>
     <script src="./content.js"></script>
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-
 </Head>
 
 <Body>
-<py-script src="./test_py_programm.py">
-    echo("teeeeeeeeeeeeeeeeeeeeest")
-</py-script>
+<p>
+    <py-script>
+        from datetime import datetime
+        now = datetime.now()
+        display(now.strftime("%m/%d/%Y, %H:%M:%S"))
+    </py-script>
+</p>
 
 <h1>Add as many URL's of Arxiv papers as you want seperated by ';'</h1>
 
