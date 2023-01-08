@@ -6,21 +6,29 @@
         AIR_ASSIGNMENT3
     </Title>
     <script src="./content.js"></script>
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </Head>
 
 <Body>
-<p>Click on the following button for calling the function: </p>
+<p>
+    <py-script>
+        from datetime import datetime
+        now = datetime.now()
+        display(now.strftime("%m/%d/%Y, %H:%M:%S"))
+    </py-script>
+</p>
 
 <h1>Add as many URL's of Arxiv papers as you want seperated by ';'</h1>
+
 
 <textarea id="in" name="in" rows="4" cols="50">Url1;Url2;Url3;Url4.</textarea>
 
 <form>
-    <input type = "button" onclick = "main()" value = "Main Print">
+    <input type="button" onclick="main()" value="Main Print">
 </form>
 
 <form>
-    <input type = "button" onclick = "msgprint()" value = "Message Print">
+    <input type="button" onclick="msgprint()" value="Message Print">
 </form>
 
 </Body>
