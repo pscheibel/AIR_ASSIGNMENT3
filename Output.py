@@ -72,7 +72,7 @@ def getFileCountsPerTopic():
     # TODO change if other topics get added
     fileCounts = {}
     fileCounts["Computer Science"] = 0
-    fileCounts["Mathematics"] = 0
+    fileCounts["Economics"] = 0
     fileCounts["Biology"] = 0
     fileCounts["Electrical Engineering"] = 0
     fileCounts["Phyiscs"] = 0

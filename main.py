@@ -10,7 +10,7 @@ CACHING_FILES_ENABLED = True
 SCIENTIFICLABELS = {0: "Biology",
                     1: "Computer Science",
                     2: "Electrical Engineering",
-                    3: "Mathematics",
+                    3: "Economics",
                     4: "Phyiscs"}
 
 
