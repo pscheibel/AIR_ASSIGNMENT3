@@ -30,30 +30,41 @@ class TestDataPreparation:
         self.initializeTrainDataStructures(valueDocs)
         return self.trainData, self.testData, self.lookupDict, wordCollectionPerLabel
 
-    def get_pdfs(self, my_url):
-        print("process: " + str(my_url))
-        links = []
-        html = urllib.request.urlopen(my_url).read()
-        soup = BeautifulSoup(html)
+    def get_pdfs(self, my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem):
+        if currentItem >= maxLoopDepth or len(links) >= desiredDataPerCategory:
+            return links
+
+        more_url = my_url + "#item" + str(currentItem)
+        print("process: " + str(more_url))
+        html = urllib.request.urlopen(more_url).read()
+        soup = BeautifulSoup(html, features="html.parser")
         for link in soup.findAll('a'):
             if "/pdf/" in str(link.get('href')):
                 links.append("https://arxiv.org" + str(link.get('href')) + ".pdf")
-        return links
+            if len(links) >= desiredDataPerCategory:
+                return links
+        return self.get_pdfs(my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem + 1)
 
     def loadPdfs(self):
-        numOfDocs = 1
-        inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs))
-        inputBio = self.get_pdfs("https://arxiv.org/list/q-bio/pastweek?show=" + str(numOfDocs))
-        inputPhysics = self.get_pdfs("https://arxiv.org/list/physics/pastweek?show=" + str(numOfDocs))
-        inputElectricalEngineering = self.get_pdfs("https://arxiv.org/list/eess/pastweek?show=" + str(numOfDocs))
-        inputMath = self.get_pdfs("https://arxiv.org/list/math/pastweek?show=" + str(numOfDocs))
+        numOfDocs = 300
+        MaxUsedPages = 10
+        inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs),
+                                             MaxUsedPages, numOfDocs, [], 1)
+        inputBio = self.get_pdfs("https://arxiv.org/list/q-bio/pastweek?show=" + str(numOfDocs),
+                                 MaxUsedPages, numOfDocs, [], 1)
+        inputPhysics = self.get_pdfs("https://arxiv.org/list/physics/pastweek?show=" + str(numOfDocs),
+                                     MaxUsedPages, numOfDocs, [], 1)
+        inputElectricalEngineering = self.get_pdfs("https://arxiv.org/list/eess/pastweek?show=" + str(numOfDocs),
+                                                   MaxUsedPages, numOfDocs, [], 1)
+        inputMath = self.get_pdfs("https://arxiv.org/list/math/pastweek?show=" + str(numOfDocs), MaxUsedPages,
+                                  numOfDocs, [], 1)
 
         self.scientificPapersPerCategory = {"Biology": inputBio,
                                             "Computer Science": inputComputerScience,
                                             "Electrical Engineering": inputElectricalEngineering,
                                             "Mathematics": inputMath,
                                             "Phyiscs": inputPhysics}
-        # print(self.scientificPapersPerCategory)
+        #print(self.scientificPapersPerCategory)
 
     def createNounFiles(self, cachingFiles, scientificLabels):
         skippedCount = 0
@@ -132,7 +143,7 @@ class TestDataPreparation:
                 f.write(mystr)
                 f.close()
                 print("File " + fileName + " created")
-            print("skippedCount of category is" + str(skippedCount))
+            print("The number of already preloaded category files (skip count) is " + str(skippedCount))
             skippedCount = 0
         print("finished!")
 
