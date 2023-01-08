@@ -9,7 +9,7 @@ CACHING_FILES_ENABLED = True
 SCIENTIFICLABELS = {0: "Biology",
                     1: "Computer Science",
                     2: "Electrical Engineering",
-                    3: "Mathematics",
+                    3: "Economics",
                     4: "Phyiscs"}
 
 
@@ -28,6 +28,6 @@ def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main(False, True, False, "./input/")
+    main(True, True, True, "./input/")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -46,25 +46,26 @@ class TestDataPreparation:
         return self.get_pdfs(my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem + 1)
 
     def loadPdfs(self):
-        numOfDocs = 300
-        MaxUsedPages = 10
-        inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs),
-                                             MaxUsedPages, numOfDocs, [], 1)
+        numOfDocs = 535
+        MaxUsedPages = 1 + int(numOfDocs / 10)
+        # for Computer Science twice data as it has must subdomains
+        inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs * 2),
+                                             MaxUsedPages, numOfDocs * 2, [], 1)
         inputBio = self.get_pdfs("https://arxiv.org/list/q-bio/pastweek?show=" + str(numOfDocs),
                                  MaxUsedPages, numOfDocs, [], 1)
         inputPhysics = self.get_pdfs("https://arxiv.org/list/physics/pastweek?show=" + str(numOfDocs),
                                      MaxUsedPages, numOfDocs, [], 1)
         inputElectricalEngineering = self.get_pdfs("https://arxiv.org/list/eess/pastweek?show=" + str(numOfDocs),
                                                    MaxUsedPages, numOfDocs, [], 1)
-        inputMath = self.get_pdfs("https://arxiv.org/list/math/pastweek?show=" + str(numOfDocs), MaxUsedPages,
-                                  numOfDocs, [], 1)
+        inputEconomics = self.get_pdfs("https://arxiv.org/list/econ/pastweek?show=" + str(numOfDocs),
+                                       MaxUsedPages, numOfDocs, [], 1)
 
         self.scientificPapersPerCategory = {"Biology": inputBio,
                                             "Computer Science": inputComputerScience,
                                             "Electrical Engineering": inputElectricalEngineering,
-                                            "Mathematics": inputMath,
+                                            "Economics": inputEconomics,
                                             "Phyiscs": inputPhysics}
-        #print(self.scientificPapersPerCategory)
+        # print(self.scientificPapersPerCategory)
 
     def createNounFiles(self, cachingFiles, scientificLabels):
         skippedCount = 0
@@ -201,7 +202,8 @@ class TestDataPreparation:
                 categoryId = categoryId + 1
         f.close()
         for category in scientificLabels.values():
-            wordCollectionPerLabel[category] = dict(sorted(wordCollectionPerLabel[category].items(), key=lambda item: item[1], reverse=True))
+            wordCollectionPerLabel[category] = dict(
+                sorted(wordCollectionPerLabel[category].items(), key=lambda item: item[1], reverse=True))
         # print("finished")
         return wordCollectionPerLabel
 
