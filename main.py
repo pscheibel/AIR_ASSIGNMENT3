@@ -23,6 +23,6 @@ def main(loadPdfs, trainNN):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main(False, True)
+    main(True, True)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -43,7 +43,7 @@ class ClassificationNN:
                 rememberEpoch = t + 1
                 rememberAcc = acc
             testAccAll[t] = acc
-        plotAccuracyPerBatch(training_plot_data)
+        #plotAccuracyPerBatch(training_plot_data)
         print("Done!")
         print("--------Recap-----------")
         print("Final Test Accuracy after " + str(epochs) + " epochs" + " is " + str(acc))
