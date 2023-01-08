@@ -25,10 +25,10 @@ class TestDataPreparation:
         self.createNounFiles(cachingFiles, scientificLabels)
 
     def executePreparation(self, scientificLabels):
-        wordCollectionPerLabel = self.setClassificationsOfTrainingData(scientificLabels)
+        self.setClassificationsOfTrainingData(scientificLabels)
         valueDocs = self.createLookUpDict()
         self.initializeTrainDataStructures(valueDocs)
-        return self.trainData, self.testData, self.lookupDict, wordCollectionPerLabel
+        return self.trainData, self.testData, self.lookupDict
 
     def get_pdfs(self, my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem):
         if currentItem >= maxLoopDepth or len(links) >= desiredDataPerCategory:
@@ -152,12 +152,13 @@ class TestDataPreparation:
         pt = "./labelledData/"
         filePathNames = os.listdir(pt)
 
-        wordCollectionPerLabel = {}
+        tfIdf = {}
+        idf = {}
         for category in scientificLabels.values():
-            wordCollectionPerLabel[category] = {}
+            tfIdf[category] = {}
 
         # print(filePathNames)
-
+        categoryCnt = len(scientificLabels)
         unique_words = set()
         isExist = os.path.exists("./relevance")
         if not isExist:
@@ -194,18 +195,32 @@ class TestDataPreparation:
                     # print(myText)
                     f.write(myText + "\n")
                     for word in associatedWords:
-                        if word in wordCollectionPerLabel[category]:
-                            wordCollectionPerLabel[category][word] = wordCollectionPerLabel[category][word] + 1
+                        if word in tfIdf[category]:
+                            tfIdf[category][word] = tfIdf[category][word] + 1
                         else:
-                            wordCollectionPerLabel[category][word] = 1
+                            tfIdf[category][word] = 1
                     break
                 categoryId = categoryId + 1
         f.close()
         for category in scientificLabels.values():
-            wordCollectionPerLabel[category] = dict(
-                sorted(wordCollectionPerLabel[category].items(), key=lambda item: item[1], reverse=True))
+            maxVal = max(tfIdf[category].values())
+            for word in tfIdf[category]:
+                # term frequency per category normalized by max frequency
+                tfIdf[category][word] = tfIdf[category][word] / maxVal
+                if word not in idf:
+                    documentFrequency = 0
+                    for otherCategory in scientificLabels.values():
+                        if word in tfIdf[otherCategory]:
+                            documentFrequency += 1
+                    inverseDocFreq = np.log10(categoryCnt / documentFrequency)
+                    idf[word] = inverseDocFreq
+                tfIdf[category][word] = tfIdf[category][word] * inverseDocFreq
+            tfIdf[category] = dict(sorted(tfIdf[category].items(), key=lambda item: item[1], reverse=True))
         # print("finished")
-        return wordCollectionPerLabel
+        with open('tfIdf.txt', 'w') as wordfile:
+            wordfile.write(json.dumps(tfIdf))
+        with open('idf.txt', 'w') as idfFile:
+            idfFile.write(json.dumps(idf))
 
     def createLookUpDict(self):
         dictIdx = 0
