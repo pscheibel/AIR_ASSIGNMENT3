@@ -11,15 +11,19 @@ def subplots(allAcc):
 
     # data second plot
     fileCounts = getFileCountsPerTopic()
-    # TODO change abbrevations if different topics are used
-    shorts = ["CS", "Math", "Bio", "Elec. Eng.", "Phys."]
-    # topics = list(fileCounts.keys())
+    topics = list(fileCounts.keys())
     counts = list(fileCounts.values())
     max_count = max(counts)
+    x = 0
+    for topic in topics:
+        if len(topic) > 7:
+            topics[x] = topic.replace(" ", "\n")
+        x += 1
 
     fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 12))
-    fig.tight_layout(pad=5.0)
-    # plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
+    plt.xticks(rotation=60)
+    fig.tight_layout(pad=8.0)
+    #plt.subplots_adjust(bottom=1)
 
     colors = ["green" if i != max_acc else "maroon" for i in acc]
     ax1.bar(epochs, acc, color=colors, width=0.4)
@@ -27,7 +31,7 @@ def subplots(allAcc):
     ax1.set_title("Test Accuracy per Epoch")
 
     colors = ["green" if i != max_count else "maroon" for i in counts]
-    ax2.bar(shorts, counts, color=colors, width=0.4)
+    ax2.bar(topics, counts, color=colors, width=0.4)
     ax2.set(xlabel='Topic', ylabel='Documents')
     ax2.set_title("Trainingdata")
 
