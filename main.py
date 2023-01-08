@@ -20,14 +20,14 @@ def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):
     if loadPdfs:
         preparation.executeLoading(CACHING_FILES_ENABLED, SCIENTIFICLABELS)
     if trainNN:
-        trainData, testData, lookupDict, wordCollectionPerLabel = preparation.executePreparation(SCIENTIFICLABELS)
+        trainData, testData, lookupDict = preparation.executePreparation(SCIENTIFICLABELS)
         training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS, modelPath)
     data, size = reader.readInput(prepareInput, inputPath)
-    application.classifyData(data, size, modelPath, wordCollectionPerLabel)
+    application.classifyData(data, size, modelPath)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main(False, True, False, "./input/")
+    main(False, False, False, "./input/")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

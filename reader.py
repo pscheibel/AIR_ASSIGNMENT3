@@ -42,11 +42,11 @@ def createNounFiles(filePath):
             if not isExist:
                 os.mkdir(inputDestination)
             f = open(str(inputDestination + "/" + fileName[:-4] + ".txt"), "w")
-            mystr = ""
+            fileDict = {}
             for tup in nouns:
-                mystr += str(tup) + ";"
-            f.write(mystr)
-            f.close()
+                fileDict[tup[0]] = tup[1]
+            with open(inputDestination + "/" + fileName[:-4] + ".txt", 'w') as wordfile:
+                wordfile.write(json.dumps(fileDict))
             print("File " + fileName + " created")
 
 
@@ -55,15 +55,10 @@ def readNounFiles():
     fileNames = os.listdir(inputDestination)
     for fileName in fileNames:
         fullPath = str(inputDestination + "/" + fileName)
-        datafromfile = np.loadtxt(fullPath, dtype=str, delimiter=';')
-        datafromfile = datafromfile[0:len(datafromfile) - 2]
+        with open(fullPath) as json_file:
+            fileDict = json.load(json_file)
         associatedWords = []
-        for ent in list(datafromfile):
-            myEnt = str(ent).replace('(', '')
-            myEnt = str(myEnt).replace(')', '')
-            myEnt = str(myEnt).replace('\'', '')
-
-            word = myEnt.split(',')[0]
+        for word in fileDict:
             associatedWords.append(word)
         dataset[fileName] = associatedWords
 
