@@ -1,10 +1,9 @@
 from torch.utils.data import DataLoader
 
-from Output import plotAccuracyPerEpoch, plotAccuracyPerBatch
+from Output import plotAccuracyPerEpoch, plotDocumentsPerTopic, subplots
 from TextClassificationModel import TextClassificationModel
 import torch
 import time
-import os
 
 # classification training in this file based on
 # https://medium.com/analytics-vidhya/a-simple-neural-network-classifier-using-pytorch-from-scratch-7ebb477422d2(03.01.2023)
@@ -48,7 +47,12 @@ class ClassificationNN:
         print("--------Recap-----------")
         print("Final Test Accuracy after " + str(epochs) + " epochs" + " is " + str(acc))
         print("Best Total Test Accuracy: " + str(rememberAcc) + " In epoch: " + str(rememberEpoch))
+
+        #plots
         plotAccuracyPerEpoch(testAccAll)
+        plotDocumentsPerTopic()
+        subplots(testAccAll)
+
         torch.save(model.state_dict(), modelPath)
 
     def collate_batch(self, batch):
