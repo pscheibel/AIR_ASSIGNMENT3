@@ -3,7 +3,7 @@ function msgprint() {
          }  
 
 function setAction(form) {
-  form.action = "register.html";
+  form.action = "./AIR_ASSIGNMENT3/index.html";
   alert(form.action);
   return false;
 }
