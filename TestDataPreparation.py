@@ -25,10 +25,10 @@ class TestDataPreparation:
         self.createNounFiles(cachingFiles, scientificLabels)
 
     def executePreparation(self, scientificLabels):
-        self.setClassificationsOfTrainingData(scientificLabels)
+        wordCollectionPerLabel = self.setClassificationsOfTrainingData(scientificLabels)
         valueDocs = self.createLookUpDict()
         self.initializeTrainDataStructures(valueDocs)
-        return self.trainData, self.testData, self.lookupDict
+        return self.trainData, self.testData, self.lookupDict, wordCollectionPerLabel
 
     def get_pdfs(self, my_url):
         print("process: " + str(my_url))
@@ -140,6 +140,10 @@ class TestDataPreparation:
         pt = "./labelledData/"
         filePathNames = os.listdir(pt)
 
+        wordCollectionPerLabel = {}
+        for category in scientificLabels.values():
+            wordCollectionPerLabel[category] = {}
+
         # print(filePathNames)
 
         unique_words = set()
@@ -177,12 +181,18 @@ class TestDataPreparation:
                     myText += str(categoryId)
                     # print(myText)
                     f.write(myText + "\n")
-                    myText = ""
+                    for word in associatedWords:
+                        if word in wordCollectionPerLabel[category]:
+                            wordCollectionPerLabel[category][word] = wordCollectionPerLabel[category][word] + 1
+                        else:
+                            wordCollectionPerLabel[category][word] = 1
                     break
                 categoryId = categoryId + 1
         f.close()
-
+        for category in scientificLabels.values():
+            wordCollectionPerLabel[category] = dict(sorted(wordCollectionPerLabel[category].items(), key=lambda item: item[1], reverse=True))
         # print("finished")
+        return wordCollectionPerLabel
 
     def createLookUpDict(self):
         dictIdx = 0
