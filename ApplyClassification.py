@@ -24,12 +24,29 @@ class ApplyClassification:
         model.load_state_dict(torch.load(modelPath))
         model.eval()
         rankingDictionaries = self.tfIdfClassification(data)
+        correctlyPredicted = {}
+        correctTfIdf = {}
         for fileName, fileContent in data:
             # print("tensor: ", torch.tensor(fileContent, dtype=torch.int64))
             predicted_label = model(torch.tensor(fileContent, dtype=torch.int64), torch.tensor([0]))
-            print("file ", fileName, " is ", self.scientificLabels[predicted_label.argmax(1).item()])
+            predicted_label = self.scientificLabels[predicted_label.argmax(1).item()]
+            for category in self.scientificLabels.values():
+                if category in fileName:
+                    if category == predicted_label:
+                        correctlyPredicted[category] = correctlyPredicted[category] + 1 if category in correctlyPredicted else 1
+                    if category == list(rankingDictionaries[fileName].keys())[0]:
+                        correctTfIdf[category] = correctTfIdf[category] + 1 if category in correctTfIdf else 1
+            print("file ", fileName, " is ", predicted_label)
             print("cosine similarity for file ", fileName, ": ")
             print(rankingDictionaries[fileName])
+            print("correctly predicted: ")
+            print(correctlyPredicted)
+            with open("correctPredictions.txt", 'w') as wordfile:
+                wordfile.write(json.dumps(correctlyPredicted))
+            print("correct with tf-idf: ")
+            print(correctTfIdf)
+            with open("correctTF-IDFs.txt", 'w') as wordfile:
+                wordfile.write(json.dumps(correctTfIdf))
         return
 
     def tfIdfClassification(self, data):

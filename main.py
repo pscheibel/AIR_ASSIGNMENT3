@@ -10,7 +10,7 @@ SCIENTIFICLABELS = {0: "Biology",
                     1: "Computer Science",
                     2: "Electrical Engineering",
                     3: "Mathematics",
-                    4: "Phyiscs"}
+                    4: "Physics"}
 
 
 def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):

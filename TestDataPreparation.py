@@ -63,7 +63,7 @@ class TestDataPreparation:
                                             "Computer Science": inputComputerScience,
                                             "Electrical Engineering": inputElectricalEngineering,
                                             "Mathematics": inputMath,
-                                            "Phyiscs": inputPhysics}
+                                            "Physics": inputPhysics}
         #print(self.scientificPapersPerCategory)
 
     def createNounFiles(self, cachingFiles, scientificLabels):
@@ -211,7 +211,7 @@ class TestDataPreparation:
                     for otherCategory in scientificLabels.values():
                         if word in tfIdf[otherCategory]:
                             documentFrequency += 1
-                    inverseDocFreq = categoryCnt / documentFrequency
+                    inverseDocFreq = np.log10(categoryCnt / documentFrequency)
                     idf[word] = inverseDocFreq
                 tfIdf[category][word] = tfIdf[category][word] * inverseDocFreq
             tfIdf[category] = dict(sorted(tfIdf[category].items(), key=lambda item: item[1], reverse=True))
