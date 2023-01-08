@@ -23,11 +23,13 @@ class ApplyClassification:
         model = TextClassificationModel(vocabSize+1, emsize, num_class)
         model.load_state_dict(torch.load(modelPath))
         model.eval()
-        self.tfIdfClassification(data)
+        rankingDictionaries = self.tfIdfClassification(data)
         for fileName, fileContent in data:
             #print("tensor: ", torch.tensor(fileContent, dtype=torch.int64))
             predicted_label = model(torch.tensor(fileContent, dtype=torch.int64), torch.tensor([0]))
             print("file ", fileName, " is ", self.scientificLabels[predicted_label.argmax(1).item()])
+            print("cosine similarity for file ", fileName, ": ")
+            print(rankingDictionaries[fileName])
         return
 
     def tfIdfClassification(self, data):
@@ -38,7 +40,7 @@ class ApplyClassification:
         categoryVectors = {}
         for category in self.scientificLabels.values():
             categoryVectors[category] = np.array(list(tfIdf[category].values()))
-
+        rankingDictionaries = {}
         for fileName, fileContent in data:
             rankingDict = {}
             with open(inputDestination + "/" + fileName) as json_file:
@@ -55,5 +57,7 @@ class ApplyClassification:
                 fileVector = np.array(list(comparisonFile.values()))
                 rankingDict[category] = np.dot(fileVector, categoryVectors[category])/(np.linalg.norm(fileVector)*np.linalg.norm(categoryVectors[category]))
             rankingDict = dict(sorted(rankingDict.items(), key=lambda item: item[1], reverse=True))
-            print("cosine similarity for file ", fileName, ": ")
-            print(rankingDict)
+            rankingDictionaries[fileName] = rankingDict
+        with open("tfIDFankingDictionaries.txt", 'w') as wordfile:
+            wordfile.write(json.dumps(rankingDictionaries))
+        return rankingDictionaries
