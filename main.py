@@ -13,7 +13,9 @@ SCIENTIFICLABELS = {0: "Biology",
                     4: "Physics"}
 
 
-def main(loadPdfs, trainNN, prepareInput, catchingFiles, inputPath="", modelPath="model.pt"):
+def main(loadPdfs, trainNN, prepareInput, catchingFiles):
+    modelPath = "model.pt"
+    inputPath="./input/"
     dataPerCategory = 535
     loadPdfs, trainNN, prepareInput, dataPerCategory, catchingFiles = readConfig("./input/config/config.txt",
                                                                                  loadPdfs, trainNN,
@@ -54,6 +56,6 @@ def readConfig(confPath, loadPdfs, trainNN, prepareInput, dataPerCategory, catch
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main(True, True, True, True, "./input/")
+    main(True, True, True, True)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
