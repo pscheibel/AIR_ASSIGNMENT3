@@ -6,6 +6,8 @@ Install packages for project with "pip install -r requirements.txt"
 To add new pdfs for classification, add them to the input folder
 
 Specific queries can be added in the queries folder, an example is given in the queries.txt
+A query consists out of a scientific category and a noun, that will be searched for.
+Documents that belong to this scientific category (according to our classification model) and contain the noun will be listed in the "queriesResult.txt" file.
 
 There are 4 flags (CACHING_FILES_ENABLED, DATASET_CREATION_ENABLED, TRAINING_ENABLED, INPUT_PREPARATION_ENABLED) in the main.py file:
 
