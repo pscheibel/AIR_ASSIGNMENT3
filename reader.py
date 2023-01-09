@@ -18,6 +18,8 @@ def createNounFiles(filePath):
     if os.path.exists(filePath):
         fileNames = os.listdir(filePath)
         for fileName in fileNames:
+            if ".pdf" not in fileName:
+                continue
             reader = PyPDF2.PdfReader(filePath + fileName)
             text = ""
             for pageNum in range(0, len(reader.pages)):

@@ -1,3 +1,0 @@
-Electrical Engineering;nature
-Physics;inverse function 
-Economics;sequential tests
