@@ -1,7 +1,25 @@
 import json
-
 import matplotlib.pyplot as plt
 import os
+
+
+# saves plot as png and pdf in output
+def savePlot(plt, name):
+    path = "./output"
+    if not os.path.exists(path):
+        os.makedirs(path)
+    plt.savefig(path + '/' + name + '.png')
+    plt.savefig(path + '/' + name + '.pdf')
+
+
+def newlineForTopics(topics):
+    x = 0
+    for topic in topics:
+        if len(topic) > 7:
+            topics[x] = topic.replace(" ", "\n")
+        x += 1
+
+    return topics
 
 
 # makes subplot with accuracy per epoch and trainigndata
@@ -13,14 +31,10 @@ def subplots(allAcc):
 
     # data second plot
     fileCounts = getFileCountsPerTopic()
-    topics = list(fileCounts.keys())
+    topics_unedited = list(fileCounts.keys())
     counts = list(fileCounts.values())
     max_count = max(counts)
-    x = 0
-    for topic in topics:
-        if len(topic) > 7:
-            topics[x] = topic.replace(" ", "\n")
-        x += 1
+    topics = newlineForTopics(topics_unedited)
 
     fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 12))
     plt.xticks(rotation=60)
@@ -28,24 +42,45 @@ def subplots(allAcc):
 
     colors = ["green" if i != max_acc else "maroon" for i in acc]
     ax1.bar(epochs, acc, color=colors, width=0.4)
-    ax1.set(xlabel='Epoch', ylabel='Accuracy')
-    ax1.set_title("Test Accuracy per Epoch")
+    ax1.set_xlabel('Epoch', fontsize=16)
+    ax1.set_ylabel('Accuracy', fontsize=16)
+    ax1.set_title("Test Accuracy per Epoch", fontsize=22)
 
     colors = ["green" if i != max_count else "maroon" for i in counts]
     ax2.bar(topics, counts, color=colors, width=0.4)
-    ax2.set(xlabel='Topic', ylabel='Documents')
-    ax2.set_title("Trainingdata")
+    ax2.set_xlabel('Topic', fontsize=16)
+    ax2.set_ylabel('Documents', fontsize=16)
+    ax2.set_title("Trainingdata", fontsize=22)
 
     savePlot(plt, 'subplots')
 
 
-# saves plot as png and pdf in output
-def savePlot(plt, name):
-    path = "./output"
-    if not os.path.exists(path):
-        os.makedirs(path)
-    plt.savefig(path + '/' + name + '.png')
-    plt.savefig(path + '/' + name + '.pdf')
+def subplotCorrectPredAndTfIdf():
+    if not os.path.exists('correctPredictions.txt'):
+        return
+    with open('correctPredictions.txt') as data:
+        correctPredictions = json.load(data)
+    if not os.path.exists('correctTF-IDFs.txt'):
+        return
+    with open('correctTF-IDFs.txt') as data:
+        correctTfIdf = json.load(data)
+
+    fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 12))
+    fig.tight_layout(pad=8.0)
+
+    topics = newlineForTopics(list(correctPredictions.keys()))
+    ax1.plot(topics, correctPredictions.values(), color='green')
+    ax1.set_xlabel('Topic', fontsize=16)
+    ax1.set_ylabel('Prediction', fontsize=16)
+    ax1.set_title("Prediction per Topic", fontsize=22)
+
+    topics = newlineForTopics(list(correctTfIdf.keys()))
+    ax2.plot(topics, correctTfIdf.values(), color='green')
+    ax2.set_xlabel('Topic', fontsize=16)
+    ax2.set_ylabel('TF-IDF', fontsize=16)
+    ax2.set_title("Correct TF-IDF per Topic", fontsize=22)
+
+    savePlot(plt, 'subplot_corrPred_tfIdf')
 
 
 # accuracy for each epoch
@@ -123,41 +158,26 @@ def plotAccuracyPerBatch(allAcc):
         plt.savefig(path + "/accuracy_per_epoch_barchart_" + str(epoch) + ".pdf")
         plt.show()
 
-def subplotCorrectPredAndTfIdf():
-    if not os.path.exists('correctPredictions.txt'):
-        return
-    with open('correctPredictions.txt') as data:
-        correctPredictions = json.load(data)
-    if not os.path.exists('correctTF-IDFs.txt'):
-        return
-    with open('correctTF-IDFs.txt') as data:
-        correctTfIdf = json.load(data)
 
-    fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 12))
-    fig.tight_layout(pad=8.0)
-
-    ax1.plot(correctPredictions.keys(), correctPredictions.values())
-    ax1.set(xlabel='Topic', ylabel='Prediction')
-    ax1.set_title("Prediction per Topic")
-
-    ax2.plot(correctTfIdf.keys(), correctTfIdf.values())
-    ax2.set(xlabel='Topic', ylabel='TF-IDF')
-    ax2.set_title("Correct TF-IDF per Topic")
-
-    savePlot(plt, 'subplot_corrPred_tfIdf')
-
-#TODO mach ich noch fertig, aber wird net in die webseite kommen
+# not needed
 def plotRanking():
     if not os.path.exists('perCentRankingDictionaries.txt'):
         return
+    if not os.path.exists('/output/ranking'):
+        os.makedirs('/output/ranking')
     with open('perCentRankingDictionaries.txt') as data:
         rankingDict = json.load(data)
 
         for text_file in rankingDict:
+            # x = newlineForTopics(rankingDict.get(text_file).keys())
             x = rankingDict.get(text_file).keys()
+            print(x)
+            # x = newlineForTopics(x_unedited)
             y = rankingDict.get(text_file).values()
 
-            plt.plot(y, x, label=text_file)
-
-        plt.legend()
-        plt.show()
+            plt.figure(figsize=(10, 5))
+            plt.plot(x, y, label=text_file)
+            print(text_file)
+            plt.title(text_file)
+            # plt.show()
+            # savePlot(plt, 'ranking/rankingOf' + str(text_file[5:10]))

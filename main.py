@@ -26,12 +26,11 @@ def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):
         training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS, modelPath)
     data, size = reader.readInput(prepareInput, inputPath)
     application.classifyData(data, size, modelPath)
-    #Output.plotRanking()
     Output.subplotCorrectPredAndTfIdf()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    main(True, True, True, "./input/")
+    main(False, False, False, "./input/")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
