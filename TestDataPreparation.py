@@ -20,15 +20,15 @@ class TestDataPreparation:
     trainData = []
     lookupDict = {}
 
-    def executeLoading(self, cachingFiles, scientificLabels):
-        self.loadPdfs()
+    def executeLoading(self, cachingFiles, scientificLabels,dataPerCategory):
+        self.loadPdfs(dataPerCategory)
         self.createNounFiles(cachingFiles, scientificLabels)
 
     def executePreparation(self, scientificLabels):
-        wordCollectionPerLabel = self.setClassificationsOfTrainingData(scientificLabels)
+        self.setClassificationsOfTrainingData(scientificLabels)
         valueDocs = self.createLookUpDict()
         self.initializeTrainDataStructures(valueDocs)
-        return self.trainData, self.testData, self.lookupDict, wordCollectionPerLabel
+        return self.trainData, self.testData, self.lookupDict
 
     def get_pdfs(self, my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem):
         if currentItem >= maxLoopDepth or len(links) >= desiredDataPerCategory:
@@ -45,26 +45,27 @@ class TestDataPreparation:
                 return links
         return self.get_pdfs(my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem + 1)
 
-    def loadPdfs(self):
-        numOfDocs = 300
-        MaxUsedPages = 10
-        inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs),
-                                             MaxUsedPages, numOfDocs, [], 1)
+    def loadPdfs(self,dataPerCategory):
+        numOfDocs = dataPerCategory
+        MaxUsedPages = 1 + int(numOfDocs / 10)
+        # for Computer Science twice data as it has must subdomains
+        inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs * 2),
+                                             MaxUsedPages, numOfDocs * 2, [], 1)
         inputBio = self.get_pdfs("https://arxiv.org/list/q-bio/pastweek?show=" + str(numOfDocs),
                                  MaxUsedPages, numOfDocs, [], 1)
         inputPhysics = self.get_pdfs("https://arxiv.org/list/physics/pastweek?show=" + str(numOfDocs),
                                      MaxUsedPages, numOfDocs, [], 1)
         inputElectricalEngineering = self.get_pdfs("https://arxiv.org/list/eess/pastweek?show=" + str(numOfDocs),
                                                    MaxUsedPages, numOfDocs, [], 1)
-        inputMath = self.get_pdfs("https://arxiv.org/list/math/pastweek?show=" + str(numOfDocs), MaxUsedPages,
-                                  numOfDocs, [], 1)
+        inputEconomics = self.get_pdfs("https://arxiv.org/list/econ/pastweek?show=" + str(numOfDocs),
+                                       MaxUsedPages, numOfDocs, [], 1)
 
         self.scientificPapersPerCategory = {"Biology": inputBio,
                                             "Computer Science": inputComputerScience,
                                             "Electrical Engineering": inputElectricalEngineering,
-                                            "Mathematics": inputMath,
-                                            "Phyiscs": inputPhysics}
-        #print(self.scientificPapersPerCategory)
+                                            "Economics": inputEconomics,
+                                            "Physics": inputPhysics}
+        # print(self.scientificPapersPerCategory)
 
     def createNounFiles(self, cachingFiles, scientificLabels):
         skippedCount = 0
@@ -151,12 +152,13 @@ class TestDataPreparation:
         pt = "./labelledData/"
         filePathNames = os.listdir(pt)
 
-        wordCollectionPerLabel = {}
+        tfIdf = {}
+        idf = {}
         for category in scientificLabels.values():
-            wordCollectionPerLabel[category] = {}
+            tfIdf[category] = {}
 
         # print(filePathNames)
-
+        categoryCnt = len(scientificLabels)
         unique_words = set()
         isExist = os.path.exists("./relevance")
         if not isExist:
@@ -193,17 +195,32 @@ class TestDataPreparation:
                     # print(myText)
                     f.write(myText + "\n")
                     for word in associatedWords:
-                        if word in wordCollectionPerLabel[category]:
-                            wordCollectionPerLabel[category][word] = wordCollectionPerLabel[category][word] + 1
+                        if word in tfIdf[category]:
+                            tfIdf[category][word] = tfIdf[category][word] + 1
                         else:
-                            wordCollectionPerLabel[category][word] = 1
+                            tfIdf[category][word] = 1
                     break
                 categoryId = categoryId + 1
         f.close()
         for category in scientificLabels.values():
-            wordCollectionPerLabel[category] = dict(sorted(wordCollectionPerLabel[category].items(), key=lambda item: item[1], reverse=True))
+            maxVal = max(tfIdf[category].values())
+            for word in tfIdf[category]:
+                # term frequency per category normalized by max frequency
+                tfIdf[category][word] = tfIdf[category][word] / maxVal
+                if word not in idf:
+                    documentFrequency = 0
+                    for otherCategory in scientificLabels.values():
+                        if word in tfIdf[otherCategory]:
+                            documentFrequency += 1
+                    inverseDocFreq = np.log10(categoryCnt / documentFrequency)
+                    idf[word] = inverseDocFreq
+                tfIdf[category][word] = tfIdf[category][word] * inverseDocFreq
+            tfIdf[category] = dict(sorted(tfIdf[category].items(), key=lambda item: item[1], reverse=True))
         # print("finished")
-        return wordCollectionPerLabel
+        with open('tfIdf.txt', 'w') as wordfile:
+            wordfile.write(json.dumps(tfIdf))
+        with open('idf.txt', 'w') as idfFile:
+            idfFile.write(json.dumps(idf))
 
     def createLookUpDict(self):
         dictIdx = 0
