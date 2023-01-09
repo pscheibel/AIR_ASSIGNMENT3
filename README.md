@@ -9,7 +9,7 @@ Specific queries can be added in the queries folder, an example is given in the 
 A query consists out of a scientific category and a noun, that will be searched for.
 Documents that belong to this scientific category (according to our classification model) and contain the noun will be listed in the "queriesResult.txt" file.
 
-There are 4 flags (CACHING_FILES_ENABLED, DATASET_CREATION_ENABLED, TRAINING_ENABLED, INPUT_PREPARATION_ENABLED) in the main.py file:
+There are 4 flags (CACHING_FILES_ENABLED, DATASET_CREATION_ENABLED, TRAINING_ENABLED, INPUT_PREPARATION_ENABLED) in the config.txt which you can find in the config folder in the input folder:
 
 CACHING_FILES_ENABLED: will cache pdf files to reduce the time needed to execute the script after the first invocation.  
 DATASET_CREATION_ENABLED: will create the database of pdfs.  
