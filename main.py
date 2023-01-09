@@ -25,7 +25,7 @@ def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):
         trainData, testData, lookupDict = preparation.executePreparation(SCIENTIFICLABELS)
         training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS, modelPath)
     data, size = reader.readInput(prepareInput, inputPath)
-    application.classifyData(data, size, modelPath)
+    application.classifyData(data, size, modelPath, inputPath)
     #Output.plotRanking()
     Output.subplotCorrectPredAndTfIdf()
 

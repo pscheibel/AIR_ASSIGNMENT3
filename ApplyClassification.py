@@ -4,6 +4,7 @@ from TextClassificationModel import TextClassificationModel
 import torch
 import json
 import numpy as np
+import os
 
 # classification training based on
 # https://medium.com/analytics-vidhya/a-simple-neural-network-classifier-using-pytorch-from-scratch-7ebb477422d2(03.01.2023)
@@ -16,7 +17,7 @@ class ApplyClassification:
     def __init__(self, scientificLabels):
         self.scientificLabels = scientificLabels
 
-    def classifyData(self, data, vocabSize, modelPath):
+    def classifyData(self, data, vocabSize, modelPath, inputPath):
         num_class = len(self.scientificLabels)
         # print(num_class)
         emsize = 64
@@ -26,6 +27,7 @@ class ApplyClassification:
         rankingDictionaries = self.tfIdfClassification(data)
         correctlyPredicted = {}
         correctTfIdf = {}
+        predictedLabelResults = {}
         for category in self.scientificLabels.values():
             correctlyPredicted[category] = 0
             correctTfIdf[category] = 0
@@ -33,6 +35,7 @@ class ApplyClassification:
             # print("tensor: ", torch.tensor(fileContent, dtype=torch.int64))
             predicted_label = model(torch.tensor(fileContent, dtype=torch.int64), torch.tensor([0]))
             predicted_label = self.scientificLabels[predicted_label.argmax(1).item()]
+            predictedLabelResults[fileName] = predicted_label
             for category in self.scientificLabels.values():
                 if category in fileName:
                     if category == predicted_label:
@@ -45,10 +48,11 @@ class ApplyClassification:
             print("\n")
         print("correctly predicted: ")
         print(correctlyPredicted)
-        with open("correctPredictions.txt", 'w') as wordfile:
-            wordfile.write(json.dumps(correctlyPredicted))
         print("correct with tf-idf: ")
         print(correctTfIdf)
+        self.queryDocs(inputPath, predictedLabelResults)
+        with open("correctPredictions.txt", 'w') as wordfile:
+            wordfile.write(json.dumps(correctlyPredicted))
         with open("correctTF-IDFs.txt", 'w') as wordfile:
             wordfile.write(json.dumps(correctTfIdf))
         return
@@ -79,7 +83,7 @@ class ApplyClassification:
                         comparisonFile[word] = 0
                 fileVector = np.array(list(comparisonFile.values()))
                 rankingDict[category] = np.dot(fileVector, categoryVectors[category]) / (
-                            np.linalg.norm(fileVector) * np.linalg.norm(categoryVectors[category]))
+                        np.linalg.norm(fileVector) * np.linalg.norm(categoryVectors[category]))
             for category in self.scientificLabels.values():
                 perCentDict[category] = round((rankingDict[category] / max(rankingDict.values())) * 100)
             rankingDict = dict(sorted(rankingDict.items(), key=lambda item: item[1], reverse=True))
@@ -91,3 +95,33 @@ class ApplyClassification:
         with open("perCentRankingDictionaries.txt", 'w') as wordfile:
             wordfile.write(json.dumps(perCentDictionaries))
         return perCentDictionaries
+
+    def queryDocs(self, inputPath, predictedLabels):
+        fullpath = inputPath + "queries/queries.txt"
+        resultFile = open(str("queriesResult.txt"), "w")
+        nounTxtPath = "./nounInput"
+        inputFiles = {}
+        if os.path.exists(fullpath):
+            fileNames = os.listdir(nounTxtPath)
+            for fileName in fileNames:
+                inputFiles
+                with open(nounTxtPath + "/" + fileName) as nounFile:
+                    inputFiles[fileName] = json.load(nounFile)
+            queriesFile = open(fullpath, 'r').readlines()
+            for query in queriesFile:
+                foundResult = False
+                query = query.strip()
+                resultFile.write(query + ":\n")
+                parts = query.split(";")
+                for key, value in predictedLabels.items():
+                    if value == parts[0]:
+                        for noun in inputFiles[key]:
+                            if parts[1] in noun:
+                                foundResult = True
+                                resultFile.write(key+"\n")
+                                break
+                if not foundResult:
+                    resultFile.write("No result found for this query...\n")
+        else:
+            resultFile.write("No queries found!")
+        resultFile.close()
