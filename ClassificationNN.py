@@ -1,10 +1,11 @@
 from torch.utils.data import DataLoader
 
+from Output import plotAccuracyPerEpoch, plotDocumentsPerTopic, subplots
 from TextClassificationModel import TextClassificationModel
 import torch
 import time
 
-# classification training based on
+# classification training in this file based on
 # https://medium.com/analytics-vidhya/a-simple-neural-network-classifier-using-pytorch-from-scratch-7ebb477422d2(03.01.2023)
 # and https://torchtutorialstaging.z5.web.core.windows.net/beginner/text_sentiment_ngrams_tutorial.html (03.01.2023)
 
@@ -13,15 +14,14 @@ device = "cpu"
 
 class ClassificationNN:
 
-    def startTraining(self, trainData, testData, vocabSize, scientificLabels):
+    def startTraining(self, trainData, testData, vocabSize, scientificLabels, modelPath):
         #print(trainData)
         trainDataloader = DataLoader(trainData, batch_size=5, shuffle=True, collate_fn=self.collate_batch)
         testDataloader = DataLoader(testData, batch_size=5, shuffle=True, collate_fn=self.collate_batch)
         num_class = len(scientificLabels)
         # print(num_class)
-        vocab_size = vocabSize
         emsize = 64
-        model = TextClassificationModel(vocab_size, emsize, num_class).to(device)
+        model = TextClassificationModel(vocabSize + 1, emsize, num_class).to(device)
         # Binary Cross Entropy loss
         # standard loss for binary classification
         loss_fn = torch.nn.CrossEntropyLoss()
@@ -30,19 +30,30 @@ class ClassificationNN:
         epochs = 45
         rememberEpoch = 0
         rememberAcc = 0
+        testAccAll = {}
+        training_plot_data = {}
         for t in range(epochs):
             print(f"Epoch {t + 1}\n-------------------------------")
-            self.train(trainDataloader, model, loss_fn, optimizer)
+            training_plot_data[t] = self.train(trainDataloader, model, loss_fn, optimizer)
             print("Test accuracy: ")
             acc = self.test(testDataloader, model, loss_fn)
             print(str(acc))
             if acc > rememberAcc:
                 rememberEpoch = t + 1
                 rememberAcc = acc
+            testAccAll[t] = acc
+        #plotAccuracyPerBatch(training_plot_data)
         print("Done!")
         print("--------Recap-----------")
         print("Final Test Accuracy after " + str(epochs) + " epochs" + " is " + str(acc))
         print("Best Total Test Accuracy: " + str(rememberAcc) + " In epoch: " + str(rememberEpoch))
+
+        #plots
+        plotAccuracyPerEpoch(testAccAll)
+        plotDocumentsPerTopic()
+        subplots(testAccAll)
+
+        torch.save(model.state_dict(), modelPath)
 
     def collate_batch(self, batch):
         labels, docs, offsets = [], [], [0]
@@ -65,6 +76,7 @@ class ClassificationNN:
         total_acc, total_count = 0, 0
         log_interval = 10
         start_time = time.time()
+        acc_per_batches = {}
         for idx, (label, text, offsets) in enumerate(dataloader):
             #print("label: ", label)
             #print("text: ", text)
@@ -84,8 +96,11 @@ class ClassificationNN:
                 print('| {:5d}/{:5d} batches '
                       '| accuracy {:8.3f}'.format(idx, len(dataloader),
                                                   total_acc / total_count))
+                acc_per_batches[idx] = (total_acc/total_count)
                 total_acc, total_count = 0, 0
                 start_time = time.time()
+
+        return acc_per_batches
 
     def test(self, dataloader, model, loss_fn):
         model.eval()
