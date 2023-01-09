@@ -64,7 +64,7 @@ class TestDataPreparation:
                                             "Computer Science": inputComputerScience,
                                             "Electrical Engineering": inputElectricalEngineering,
                                             "Economics": inputEconomics,
-                                            "Phyiscs": inputPhysics}
+                                            "Physics": inputPhysics}
         # print(self.scientificPapersPerCategory)
 
     def createNounFiles(self, cachingFiles, scientificLabels):

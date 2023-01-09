@@ -42,6 +42,7 @@ class ApplyClassification:
             print("file ", fileName, " is ", predicted_label)
             print("cosine similarity for file ", fileName, ": ")
             print(rankingDictionaries[fileName])
+            print("\n")
         print("correctly predicted: ")
         print(correctlyPredicted)
         with open("correctPredictions.txt", 'w') as wordfile:
