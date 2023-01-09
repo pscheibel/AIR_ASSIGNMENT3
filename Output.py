@@ -75,7 +75,7 @@ def getFileCountsPerTopic():
     fileCounts["Economics"] = 0
     fileCounts["Biology"] = 0
     fileCounts["Electrical Engineering"] = 0
-    fileCounts["Phyiscs"] = 0
+    fileCounts["Physics"] = 0
     for file in fileNames:
         for topic in fileCounts:
             if topic in file:

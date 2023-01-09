@@ -4,6 +4,7 @@ import reader
 from ApplyClassification import ApplyClassification
 from ClassificationNN import ClassificationNN
 from TestDataPreparation import TestDataPreparation
+import os
 
 CACHING_FILES_ENABLED = True
 
@@ -20,7 +21,7 @@ def main(loadPdfs, trainNN, prepareInput, inputPath="", modelPath="model.pt"):
     application = ApplyClassification(SCIENTIFICLABELS)
     if loadPdfs:
         preparation.executeLoading(CACHING_FILES_ENABLED, SCIENTIFICLABELS)
-    if trainNN:
+    if trainNN or (not (os.path.exists("lookupdict.txt") and os.path.exists("model.pt") and os.path.exists("tfIdf.txt") and os.path.exists("idf.txt"))):
         trainData, testData, lookupDict = preparation.executePreparation(SCIENTIFICLABELS)
         training.startTraining(trainData, testData, len(lookupDict), SCIENTIFICLABELS, modelPath)
     data, size = reader.readInput(prepareInput, inputPath)
