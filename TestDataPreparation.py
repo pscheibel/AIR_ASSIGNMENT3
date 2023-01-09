@@ -20,8 +20,8 @@ class TestDataPreparation:
     trainData = []
     lookupDict = {}
 
-    def executeLoading(self, cachingFiles, scientificLabels):
-        self.loadPdfs()
+    def executeLoading(self, cachingFiles, scientificLabels,dataPerCategory):
+        self.loadPdfs(dataPerCategory)
         self.createNounFiles(cachingFiles, scientificLabels)
 
     def executePreparation(self, scientificLabels):
@@ -45,8 +45,8 @@ class TestDataPreparation:
                 return links
         return self.get_pdfs(my_url, maxLoopDepth, desiredDataPerCategory, links, currentItem + 1)
 
-    def loadPdfs(self):
-        numOfDocs = 535
+    def loadPdfs(self,dataPerCategory):
+        numOfDocs = dataPerCategory
         MaxUsedPages = 1 + int(numOfDocs / 10)
         # for Computer Science twice data as it has must subdomains
         inputComputerScience = self.get_pdfs("https://arxiv.org/list/cs/pastweek?show=" + str(numOfDocs * 2),
