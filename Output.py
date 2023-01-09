@@ -73,12 +73,14 @@ def subplotCorrectPredAndTfIdf():
     ax1.set_xlabel('Topic', fontsize=16)
     ax1.set_ylabel('Prediction', fontsize=16)
     ax1.set_title("Prediction per Topic", fontsize=22)
+    ax1.fill_between(topics, correctPredictions.values(), 0, color='green', alpha=.1)
 
     topics = newlineForTopics(list(correctTfIdf.keys()))
     ax2.plot(topics, correctTfIdf.values(), color='green')
     ax2.set_xlabel('Topic', fontsize=16)
     ax2.set_ylabel('TF-IDF', fontsize=16)
     ax2.set_title("Correct TF-IDF per Topic", fontsize=22)
+    ax2.fill_between(topics, correctTfIdf.values(), 0, color='green', alpha=.1)
 
     savePlot(plt, 'subplot_corrPred_tfIdf')
 
